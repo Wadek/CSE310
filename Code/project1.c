@@ -4,10 +4,6 @@
 #include <stdarg.h>
 #include <math.h>
 
-
-
-int main () {
-
 #define NO_TEAMS      32 // Number of NFL teams
 #define TEAM_NAME_LEN 25 // Maximum team name string length
 #define TOP_LEN        6 // Maximum time of possession string length
@@ -34,9 +30,17 @@ int main () {
         int lost; // Fumbles lost
         int to; // Turnover ratio
     };
+
     struct annual_stats{
         int year;
         struct team_stats teams[ NO_TEAMS ];
     };
 
+    void bsortYear();
+    void bfindYear();
+    void bsortRange();
+
+int main () {
+
 }
+
