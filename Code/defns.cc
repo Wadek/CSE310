@@ -1,6 +1,7 @@
 #define NO_TEAMS      32 // Number of NFL teams
 #define TEAM_NAME_LEN 25 // Maximum team name string length
 #define TOP_LEN        6 // Maximum time of possession string length
+
 struct team_stats{
     char team_name[ TEAM_NAME_LEN  ]; // Name of NFL team
     int games; // Number of games played in the season

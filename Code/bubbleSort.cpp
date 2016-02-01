@@ -1,5 +1,18 @@
 #include<iostream>
+#include <sstream>
+#include <string>
+
 using namespace std;
+
+
+void readFile() {
+    std::ifstream input( "../2015-game-stats.txt" );
+
+    for(std::string line; getline( input, line ); )
+    {
+        cout<<line;
+    }
+}
 
 void sortDesc() {
     int hold;
@@ -13,10 +26,10 @@ void sortDesc() {
     {
         for(int j=0; j<4; j++)
         { if(array[j]>array[j+1]) {
-                hold=array[j];
-                array[j]=array[j+1];
-                array[j+1]=hold;
-            }
+                                      hold=array[j];
+                                      array[j]=array[j+1];
+                                      array[j+1]=hold;
+                                  }
         }
     }
 
@@ -39,10 +52,10 @@ void sortAsc() {
     {
         for(int j=0; j<4; j++)
         { if(array[j]<array[j+1]) {
-                hold=array[j];
-                array[j]=array[j+1];
-                array[j+1]=hold;
-            }
+                                      hold=array[j];
+                                      array[j]=array[j+1];
+                                      array[j+1]=hold;
+                                  }
         }
     }
 
@@ -60,11 +73,11 @@ void bsort() {
     if(dec == 1) {
         sortAsc();
     }else {
-         sortDesc();
+        sortDesc();
     }
 }
 
 main() {
-    bsort();
-
+    //
+    //sort();
 }
