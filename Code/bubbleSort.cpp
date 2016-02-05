@@ -1,5 +1,6 @@
 #include <algorithm>
-#include<iostream> #include <sstream>
+#include<iostream> 
+#include <sstream>
 #include <fstream>
 #include <string>
 #include <cstring>
@@ -7,7 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "defns.cc"
 
 using namespace std;
