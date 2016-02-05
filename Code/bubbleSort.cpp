@@ -31,64 +31,11 @@ string team_name;
 string* field;
 struct annual_stats* annualStatsList;
 
-
-void sortAsc(int list[]) {
-	int hold;
-
-	for(int i=0; i<19; i++)
-	{
-		for(int j=0; j<19; j++){
-			if(list[j]>list[j+1]) {
-				hold=list[j];
-				list[j]=list[j+1];
-				list[j+1]=hold;
-			}
-		}
-	}
-
-	cout<<""<<endl;
-	cout<<"Teams \t\t\t";
-	cout<<"c is limited";
-	cout<<"\n"<<endl;
-
-	for(int i=0; i<20; i++)
-	{
-		cout<<list[i]<<endl;
-	}
-}
-
-void sortDesc(int list[]) {
-	int hold;
-
-	for(int i=0; i<31; i++)
-	{
-		for(int j=0; j<31; j++){
-			if(list[j]<list[j+1]) {
-				hold=list[j];
-				list[j]=list[j+1];
-				list[j+1]=hold;
-			}
-		}
-	}
-	cout<<""<<endl;
-	cout<<"Teams \t\t\t";
-	cout<<"c is limited";
-	cout<<"\n"<<endl;
-
-	for(int i=0; i<32; i++)
-	{
-		cout<<annualStatsList[indexYear].teams[i].team_name;
-		cout<<" \t";
-		cout<<list[i]<<endl;
-	}
-	cout<<"\n\n\n"<<endl;
-}
-
+//sorts teams alphabetically, by name
 void sortAscChar(string dlist[]){
 	string hold;
 	for(int i=0; i<31; i++)
 	{
-
 		for(int j=0; j<31; j++){
 			if(dlist[j]>dlist[j+1]) {
 				hold=dlist[j];
@@ -97,14 +44,14 @@ void sortAscChar(string dlist[]){
 			}
 		}
 	}
-
+	/*
 	for(int i=0; i<32; i++)
 	{
-
 		cout<<dlist[i]<<endl;
-	}
+	}*/
 }
 
+//sorts teams alphabetically, by name, z first
 void sortDescChar(string dlist[]){
 	string hold;
 	for(int i=0; i<19; i++)
@@ -119,18 +66,86 @@ void sortDescChar(string dlist[]){
 
 		}
 	}
-
+/*
 	for(int i=0; i<20; i++)
 	{
 		cout<<dlist[i]<<endl;
 	}
+	*/
 }
+
+void sortAsc(int list[]) {
+	int hold;
+
+	for(int i=0; i<31; i++)
+	{
+		for(int j=0; j<31; j++){
+			if(list[j]>list[j+1]) {
+				hold=list[j];
+				list[j]=list[j+1];
+				list[j+1]=hold;
+			}
+		}
+	}
+
+	cout<<""<<endl;
+	cout<<"Teams \t\t\t";
+	cout<<"\n"<<endl;
+
+	for(int i=0; i<32; i++)
+	{
+		cout<<annualStatsList[indexYear].teams[i].team_name;
+		cout<<"\t\t\t";
+		cout<<list[i]<<endl;
+		cout<<""<<endl;
+	}
+}
+
+void sortDesc(int list[]) {
+	int hold;
+	int matching = 0;
+
+	for(int i=0; i<31; i++)
+	{
+		for(int j=0; j<31; j++){
+			if(list[j]<list[j+1]) {
+				hold=list[j];
+				list[j]=list[j+1];
+				list[j+1]=hold;
+			}
+		}
+	}
+	for(int i = 0; i < 31; i++) {
+			if(list[i] == list[i+1]){
+				matching ++;
+			}
+			dlist[matching];
+	}
+			cout<<matching<<endl;
+	cout<<""<<endl;
+	cout<<"Teams \t\t\t\t";
+	cout<<"c is limited";
+	cout<<"\n"<<endl;
+
+	for(int i=0; i<32; i++)
+	{
+		cout<<annualStatsList[indexYear].teams[i].team_name;
+		cout<<" \t\t";
+		cout<<list[i]<<endl;
+	}
+		cout<<"\n"<<endl;
+}
+
 
 void bfind(annual_stats* annualStatsList ,int year,string order) {
 
 	for(int n=0; n < numberOfYears; n++ ) {
 		if(annualStatsList[n].year == whichYear) {
 			indexYear = n;
+		}
+		else {
+			cout<<"Error: no such year." <<endl;
+			break;
 		}
 	}
 
@@ -247,22 +262,28 @@ if(order == "max") {
 			}
 		}
 	}
+	cout<<"Team \t\t\t";
+	cout<<"Max ";
+	cout<<"c is limited"<<endl;
+	cout<<"\n";
 	cout<<annualStatsList[indexYear].teams[1].team_name;
 	cout<<"\t";
 	cout<<list[1]<<endl;
 	cout<<"\n\n";
 
 }
-
 if(order =="average") {
-	int total;
-	for(int i =0; i < 31; i++) {
-		list[i]+total;
+	int total = 0;
+
+	for(int i =0; i < 32; i++) {
+		total = total+list[i];
 	}
 	int average = total/32;
-	cout<<"average: \t";
-	cout<<average<<endl;
+	cout<<"Average ";
+	cout<<"c is limited";
 	cout<<"\n\n";
+	cout<<average<<endl;
+	cout <<"\n";
 
 }
 
@@ -277,10 +298,14 @@ cin.ignore();
 
 void bsort(annual_stats* annualStatsList ,int year,string order) {
 
-	// check year, grab correct index, re-write year as index var
+	// check year, grab correct index, re-write year as index var, error if no year match
 	for(int n=0; n < numberOfYears; n++ ) {
 		if(annualStatsList[n].year == whichYear) {
 			indexYear = n;
+		}
+		else {
+			cout<<"Error: no such year." <<endl;
+			break;
 		}
 	}
 
@@ -548,7 +573,6 @@ main() {
 			getline(cin, top_per_game, '\t');
 			strcpy(annualStatsList[i].teams[j].top_per_game, top_per_game.c_str());
 
-			//cin >> fum;
 			cin >> temp;
 			annualStatsList->teams[j].fum = temp;
 
