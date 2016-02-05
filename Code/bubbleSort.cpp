@@ -1,5 +1,5 @@
-#include<iostream>
-#include <sstream>
+#include <algorithm>
+#include<iostream> #include <sstream>
 #include <fstream>
 #include <string>
 #include <cstring>
@@ -11,7 +11,6 @@
 #include "defns.cc"
 
 using namespace std;
-//std::ifstream input("../2015-game-stats.txt");
 
 int numberOfYears, games, total_points, scrimmage_plays, third_md, third_att, third_pct, fourth_md, fourth_att, fourth_pct, penalties, pen_yds, fum, lost, to;
 int whichYear = 0;
@@ -101,6 +100,7 @@ void sortAscChar(string dlist[]){
 
 	for(int i=0; i<32; i++)
 	{
+
 		cout<<dlist[i]<<endl;
 	}
 }
@@ -483,6 +483,7 @@ main() {
 		for(int j = 0; j < 32; j++ ) {
 			cin.ignore();
 			getline(cin, team_name, '\t');
+			team_name.erase(remove( team_name.begin(), team_name.end(), '\"' ),team_name.end());
 			strcpy(annualStatsList[i].teams[j].team_name, team_name.c_str());
 
 			cin.ignore();
@@ -551,10 +552,12 @@ main() {
 			cin >> temp;
 			annualStatsList->teams[j].fum = temp;
 
-			cin >> lost;
+			//cin >> lost;
+			cin >> temp;
 			annualStatsList->teams[j].lost = temp;
 
-			cin >> to;
+			//cin >> to;
+			cin >> temp;
 			annualStatsList->teams[j].to = temp;
 			cin.ignore();
 		}
