@@ -101,9 +101,9 @@ void sortAsc(int list[]) {
 	}
 }
 
+//bubble sort in descending order
 void sortDesc(int list[]) {
 	int hold;
-	int matching = 0;
 
 	for(int i=0; i<31; i++)
 	{
@@ -117,11 +117,9 @@ void sortDesc(int list[]) {
 	}
 	for(int i = 0; i < 31; i++) {
 			if(list[i] == list[i+1]){
-				matching ++;
+				strcmp(annualStatsList[indexYear].teams[i].team_name, annualStatsList[indexYear].teams[i+1].team_name) ;
 			}
-			dlist[matching];
 	}
-			cout<<matching<<endl;
 	cout<<""<<endl;
 	cout<<"Teams \t\t\t\t";
 	cout<<"c is limited";
@@ -505,85 +503,35 @@ main() {
 		cin >> whichYear;
 		annualStatsList[i].year = whichYear;
 
-		for(int j = 0; j < 32; j++ ) {
+		for(int j = 0; j < NO_TEAMS; j++ ) {
 			cin.ignore();
 			getline(cin, team_name, '\t');
 			team_name.erase(remove( team_name.begin(), team_name.end(), '\"' ),team_name.end());
 			strcpy(annualStatsList[i].teams[j].team_name, team_name.c_str());
 
-			cin.ignore();
-			//cin >> games;
-			cin >> temp;
-			annualStatsList->teams[j].games = temp;
-
-			cin.ignore();
-			//cin >> pts_per_game;
-			cin >> tempFloat;
-			annualStatsList->teams[j].pts_per_game = tempFloat;
-
-			//cin >> total_points;
-			cin >> temp;
-			annualStatsList->teams[j].total_points = temp;
-
-			//cin >> scrimmage_plays;
-			cin >> temp;
-			annualStatsList->teams[j].scrimmage_plays = temp;
-
-			//cin >> yds_per_game;
-			cin >> tempFloat;
-			annualStatsList->teams[j].yds_per_game = tempFloat;
-
-			//cin >> yds_per_play;
-			cin >> tempFloat;
-			annualStatsList->teams[j].yds_per_play= tempFloat;
-
-			//cin >> first_per_game;
-			cin >> tempFloat;
-			annualStatsList->teams[j].first_per_game = temp;
-
-			cin >> third_md;
-			annualStatsList->teams[j].third_md = temp;
-
-			cin >> third_att;
-			annualStatsList->teams[j].third_att = temp;
-
-			cin >> third_pct;
-			annualStatsList->teams[j].third_pct = temp;
-
-			cin >> fourth_md;
-			annualStatsList->teams[j].fourth_md = temp;
-
-			//cin >> fourth_att;
-			cin >> temp;
-			annualStatsList->teams[j].fourth_att = temp;
-
-
-			//cin >> fourth_pct;
-			cin >> temp;
-			annualStatsList->teams[j].fourth_pct = temp;
-
-			//cin >> penalties;
-			cin >> temp;
-			annualStatsList->teams[j].penalties = temp;
-
-			cin >> pen_yds;
-			annualStatsList->teams[j].pen_yds;
+			cin >> annualStatsList->teams[j].games;
+			cin >> annualStatsList->teams[j].pts_per_game;
+			cin >> annualStatsList->teams[j].total_points;
+			cin >> annualStatsList->teams[j].scrimmage_plays;
+			cin >> annualStatsList->teams[j].yds_per_game;
+			cin >> annualStatsList->teams[j].yds_per_play;
+			cin >> annualStatsList->teams[j].first_per_game;
+			cin >> annualStatsList->teams[j].third_md;
+			cin >> annualStatsList->teams[j].third_att;
+			cin >> annualStatsList->teams[j].third_pct;
+			cin >> annualStatsList->teams[j].fourth_md;
+			cin >> annualStatsList->teams[j].fourth_att;
+			cin >> annualStatsList->teams[j].fourth_pct;
+			cin >> annualStatsList->teams[j].penalties;
+			cin >> annualStatsList->teams[j].pen_yds;
 
 			cin.ignore();
 			getline(cin, top_per_game, '\t');
 			strcpy(annualStatsList[i].teams[j].top_per_game, top_per_game.c_str());
 
-			cin >> temp;
-			annualStatsList->teams[j].fum = temp;
-
-			//cin >> lost;
-			cin >> temp;
-			annualStatsList->teams[j].lost = temp;
-
-			//cin >> to;
-			cin >> temp;
-			annualStatsList->teams[j].to = temp;
-			cin.ignore();
+			cin >>annualStatsList->teams[j].fum;
+			cin >>annualStatsList->teams[j].lost;
+			cin >>annualStatsList->teams[j].to;
 		}
 
 		cin >> algAmount;
