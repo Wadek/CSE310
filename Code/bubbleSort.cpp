@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iomanip>
 #include<iostream> 
 #include <sstream>
 #include <fstream>
@@ -22,7 +23,7 @@ string year1;
 string year2;
 string stat;
 string order;
-int algAmount,year, year3, year4;
+int lines,year, year3, year4;
 int list[99];
 char clist[25];
 string dlist[32];
@@ -94,8 +95,11 @@ void sortAsc(int list[]) {
 
 	for(int i=0; i<32; i++)
 	{
-		cout<<annualStatsList[indexYear].teams[i].team_name;
 		cout<<"\t\t\t";
+		cout << strlen(annualStatsList[indexYear].teams[1].team_name) <<endl;
+		if(strlen(annualStatsList[indexYear].teams[1].team_name) < 16) {
+			cout<<"\t";
+		}
 		cout<<list[i]<<endl;
 		cout<<""<<endl;
 	}
@@ -116,22 +120,25 @@ void sortDesc(int list[]) {
 		}
 	}
 	for(int i = 0; i < 31; i++) {
-			if(list[i] == list[i+1]){
-				strcmp(annualStatsList[indexYear].teams[i].team_name, annualStatsList[indexYear].teams[i+1].team_name) ;
-			}
+		if(list[i] == list[i+1]){
+			strcmp(annualStatsList[indexYear].teams[i].team_name, annualStatsList[indexYear].teams[i+1].team_name) ;
+		}
 	}
 	cout<<""<<endl;
 	cout<<"Teams \t\t\t\t";
-	cout<<"c is limited";
+	cout<<stat;
 	cout<<"\n"<<endl;
 
 	for(int i=0; i<32; i++)
 	{
 		cout<<annualStatsList[indexYear].teams[i].team_name;
-		cout<<" \t\t";
+		cout<<"\t\t";
+		if(strlen(annualStatsList[indexYear].teams[i].team_name) < 16) {
+			cout<<"\t";
+		}
 		cout<<list[i]<<endl;
 	}
-		cout<<"\n"<<endl;
+	cout<<"\n"<<endl;
 }
 
 
@@ -271,16 +278,16 @@ if(order == "max") {
 
 }
 if(order =="average") {
-	int total = 0;
+	float total = 0;
 
 	for(int i =0; i < 32; i++) {
 		total = total+list[i];
 	}
-	int average = total/32;
+	float average = total/32;
 	cout<<"Average ";
-	cout<<"c is limited";
+	cout<<stat;
 	cout<<"\n\n";
-	cout<<average<<endl;
+	cout<< setprecision(4)<<average<<endl;
 	cout <<"\n";
 
 }
@@ -495,10 +502,8 @@ cin.ignore();
 main() {
 	cin >> numberOfYears;
 	annualStatsList = new annual_stats[numberOfYears];
-	int temp;
-	string tempString;
-	float tempFloat;
 
+	//takes in file as if it were a user inputting data
 	for(int i = 0; i < numberOfYears; i++) {
 		cin >> whichYear;
 		annualStatsList[i].year = whichYear;
@@ -534,9 +539,10 @@ main() {
 			cin >>annualStatsList->teams[j].to;
 		}
 
-		cin >> algAmount;
-		//deicdes how to treat commands at end of file
-		for(int m = 0;m < algAmount; m++) {
+		cin >> lines;
+
+		//decides how to treat commands at end of file
+		for(int m = 0;m < lines; m++) {
 			cin >> command;
 			//&field = command;
 			cin >> range;
