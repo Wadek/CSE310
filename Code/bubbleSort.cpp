@@ -13,7 +13,8 @@
 
 using namespace std;
 
-int numberOfYears, games, total_points, scrimmage_plays, third_md, third_att, third_pct, fourth_md, fourth_att, fourth_pct, penalties, pen_yds, fum, lost, to;
+int numberOfYears, games, total_points, scrimmage_plays;
+int third_md, third_att, third_pct, fourth_md, fourth_att, fourth_pct, penalties, pen_yds, fum, lost, to;
 int whichYear = 0;
 float pts_per_game, yds_per_game, first_per_game;
 string top_per_game;
@@ -21,16 +22,19 @@ string command;
 string range;
 string year1;
 string year2;
-string stat;
+string field;
 string order;
 int lines,year, year3, year4;
 int list[99];
 char clist[25];
-string dlist[32];
+string dlist[NO_TEAMS];
 int indexYear;
 string team_name;
-string* field;
 struct annual_stats* annualStatsList;
+
+int getIntFieldValue(team_stats, string);
+float getFloatFieldValue(team_stats, string);
+string typeOfField(string);
 
 //sorts teams alphabetically, by name
 void sortAscChar(string dlist[]){
@@ -45,11 +49,6 @@ void sortAscChar(string dlist[]){
 			}
 		}
 	}
-	/*
-	for(int i=0; i<32; i++)
-	{
-		cout<<dlist[i]<<endl;
-	}*/
 }
 
 //sorts teams alphabetically, by name, z first
@@ -67,20 +66,14 @@ void sortDescChar(string dlist[]){
 
 		}
 	}
-/*
-	for(int i=0; i<20; i++)
-	{
-		cout<<dlist[i]<<endl;
-	}
-	*/
 }
 
 void sortAsc(int list[]) {
 	int hold;
 
-	for(int i=0; i<31; i++)
+	for(int i=0; i<NO_TEAMS-1; i++)
 	{
-		for(int j=0; j<31; j++){
+		for(int j=0; j<NO_TEAMS-1-i; j++){
 			if(list[j]>list[j+1]) {
 				hold=list[j];
 				list[j]=list[j+1];
@@ -93,11 +86,10 @@ void sortAsc(int list[]) {
 	cout<<"Teams \t\t\t";
 	cout<<"\n"<<endl;
 
-	for(int i=0; i<32; i++)
+	for(int i=0; i<NO_TEAMS; i++)
 	{
 		cout<<"\t\t\t";
-		cout << strlen(annualStatsList[indexYear].teams[1].team_name) <<endl;
-		if(strlen(annualStatsList[indexYear].teams[1].team_name) < 16) {
+		if(strlen(annualStatsList[indexYear].teams[i].team_name) < 16) {
 			cout<<"\t";
 		}
 		cout<<list[i]<<endl;
@@ -105,31 +97,67 @@ void sortAsc(int list[]) {
 	}
 }
 
+void bsort(team_stats* teams, string field, string order) {
+	team_stats hold;
+	bool compare, equal;
+
+	for(int i=0; i<NO_TEAMS-1; i++)
+	{
+		for(int j=0; j<NO_TEAMS-1-i; j++){
+
+			if (order == "decr") {
+				if (typeOfField(field) == "float") {
+					compare = getFloatFieldValue(teams[j], field)<getFloatFieldValue(teams[j+1], field);	
+				} else {
+					compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);	
+				}
+			} else {
+				if (typeOfField(field) == "float") {
+					compare = getFloatFieldValue(teams[j], field)>getFloatFieldValue(teams[j+1], field);	
+				} else {
+					compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);	
+				}
+			}
+			if (typeOfField(field) == "float") {
+				equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);	
+			} else {
+				equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);	
+			}
+
+			if (compare || (equal && strcmp(teams[j].team_name, teams[j+1].team_name) < 0)) {
+				hold=teams[j];
+				teams[j]=teams[j+1];
+				teams[j+1]=hold;
+			} 
+
+		}
+
+	}
+}
+
 //bubble sort in descending order
 void sortDesc(int list[]) {
 	int hold;
 
-	for(int i=0; i<31; i++)
+	for(int i=0; i<NO_TEAMS-1; i++)
 	{
-		for(int j=0; j<31; j++){
-			if(list[j]<list[j+1]) {
+		for(int j=0; j<NO_TEAMS-1-i; j++){
+			if(list[j]<list[j+1] || (list[j] == list[j+1] && strcmp(annualStatsList[indexYear].teams[j].team_name, annualStatsList[indexYear].teams[j+1].team_name) > 0)) {
+
 				hold=list[j];
 				list[j]=list[j+1];
 				list[j+1]=hold;
 			}
 		}
+
 	}
-	for(int i = 0; i < 31; i++) {
-		if(list[i] == list[i+1]){
-			strcmp(annualStatsList[indexYear].teams[i].team_name, annualStatsList[indexYear].teams[i+1].team_name) ;
-		}
-	}
+
 	cout<<""<<endl;
 	cout<<"Teams \t\t\t\t";
-	cout<<stat;
+	cout<<field;
 	cout<<"\n"<<endl;
 
-	for(int i=0; i<32; i++)
+	for(int i=0; i<NO_TEAMS; i++)
 	{
 		cout<<annualStatsList[indexYear].teams[i].team_name;
 		cout<<"\t\t";
@@ -154,12 +182,10 @@ void bfind(annual_stats* annualStatsList ,int year,string order) {
 		}
 	}
 
-	if(stat == "team_name"){
-		for(int i = 0; i<32; i++) {
+	if(field == "team_name"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			dlist[i] = annualStatsList[indexYear].teams[i].team_name;
 		}
-
-
 	}
 
 	if(order == "incr") {
@@ -168,88 +194,88 @@ void bfind(annual_stats* annualStatsList ,int year,string order) {
 		//  sortDescChar(clist);
 	}
 
-	if(stat == "games"){
-		for(int i = 0; i<32; i++) {
+	if(field == "games"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].games;
 		}
 	}
-	if(stat == "pts_per_game"){
-		for(int i = 0; i<32; i++) {
+	if(field == "pts_per_game"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].pts_per_game;
 		}
 	}
-	if(stat == "total_points"){
-		for(int i = 0; i<32; i++) {
+	if(field == "total_points"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].total_points;
 		}
 	}
-	if(stat == "scrimmage_plays"){
-		for(int i = 0; i<32; i++) {
+	if(field == "scrimmage_plays"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].scrimmage_plays;
 		}
 	}
-	if(stat == "yds_per_game"){
-		for(int i = 0; i<32; i++) {
+	if(field == "yds_per_game"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].yds_per_game;
 		}
 	}
-	if(stat == "yds_per_play"){
-		for(int i = 0; i<32; i++) {
+	if(field == "yds_per_play"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].yds_per_play;
 		}
 	}
-	if(stat == "first_per_game"){
-		for(int i = 0; i<32; i++) {
+	if(field == "first_per_game"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].games;
 		}
 	}
-	if(stat == "third_md"){
-		for(int i = 0; i<32; i++) {
+	if(field == "third_md"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].third_md;
 		}
 	}
-	if(stat == "third_att"){
-		for(int i = 0; i<32; i++) {
+	if(field == "third_att"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].third_att;
 		}
 	}
-	if(stat == "fourth_pct"){
-		for(int i = 0; i<32; i++) {
+	if(field == "fourth_pct"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].fourth_pct;
 		}
 	}
-	if(stat == "penalties"){
-		for(int i = 0; i<32; i++) {
+	if(field == "penalties"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].penalties;
 		}
 	}
-	if(stat == "pen_yds"){
-		for(int i = 0; i<32; i++) {
+	if(field == "pen_yds"){
+		for(int i = 0; i<NO_TEAMS; i++) {
 			list[i] = annualStatsList[indexYear].teams[i].pen_yds;
 		}
 	}
 	/*
-	   if(stat == "top_per_game"){
+	   if(field == "top_per_game"){
 
-	   for(int i = 0; i<32; i++) {
+	   for(int i = 0; i<NO_TEAMS; i++) {
 	   for(int j = 0; j < 6;j++) {
 	   clist[i][j] = annualStatsList[indexYear].teams[i].top_per_game;
 	   }
 	   }
 //bsortChar(clist);
 }*/
-if(stat == "fum"){
-	for(int i = 0; i<32; i++) {
+if(field == "fum"){
+	for(int i = 0; i<NO_TEAMS; i++) {
 		list[i] = annualStatsList[indexYear].teams[i].fum;
 	}
 }
-if(stat == "lost"){
-	for(int i = 0; i<32; i++) {
+if(field == "lost"){
+	for(int i = 0; i<NO_TEAMS; i++) {
 		list[i] = annualStatsList[indexYear].teams[i].lost;
 	}
 }
-if(stat == "to"){
-	for(int i = 0; i<32; i++) {
+if(field == "to"){
+	for(int i = 0; i<NO_TEAMS; i++) {
 		list[i] = annualStatsList[indexYear].teams[i].to;
 	}
 }
@@ -269,7 +295,7 @@ if(order == "max") {
 	}
 	cout<<"Team \t\t\t";
 	cout<<"Max ";
-	cout<<"c is limited"<<endl;
+	cout<<field<<endl;
 	cout<<"\n";
 	cout<<annualStatsList[indexYear].teams[1].team_name;
 	cout<<"\t";
@@ -280,12 +306,12 @@ if(order == "max") {
 if(order =="average") {
 	float total = 0;
 
-	for(int i =0; i < 32; i++) {
+	for(int i =0; i < NO_TEAMS; i++) {
 		total = total+list[i];
 	}
-	float average = total/32;
+	float average = total/NO_TEAMS;
 	cout<<"Average ";
-	cout<<stat;
+	cout<<field;
 	cout<<"\n\n";
 	cout<< setprecision(4)<<average<<endl;
 	cout <<"\n";
@@ -300,8 +326,54 @@ cin.clear();
 cin.ignore();
 }
 
+int getIntFieldValue(team_stats team, string field) {
 
-void bsort(annual_stats* annualStatsList ,int year,string order) {
+	if(field == "games") return team.games;
+	if(field == "total_points") return team.total_points;
+	if(field == "scrimmage_plays") return team.scrimmage_plays;
+	if(field == "third_md") return team.third_md;
+	if(field == "third_att") return team.third_att;
+	if(field == "third_pct") return team.third_pct;
+	if(field == "fourth_md") return team.fourth_md;
+	if(field == "fourth_att") return team.fourth_att;
+	if(field == "fourth_pct") return team.fourth_pct;
+	if(field == "penalties") return team.penalties;
+	if(field == "pen_yds") return team.pen_yds;
+	if(field == "fum") return team.fum;
+	if(field == "lost") return team.lost;
+	if(field == "to") return team.to;
+
+	return -1;
+}
+
+string getStringFieldValue(team_stats* team, string field) {
+
+	if(field == "team_name") return team->team_name;
+	if(field == "top_per_game") return team->top_per_game;
+
+	return NULL;
+}
+
+string typeOfField(string field) {
+	if(field == "pts_per_game" ||
+	field == "yds_per_game" ||
+	field == "yds_per_play" ||
+	field == "first_per_game") return "float";
+
+	return "int";
+}
+
+float getFloatFieldValue(team_stats team, string field) {
+
+	if(field == "pts_per_game") return team.pts_per_game;
+	if(field == "yds_per_game") return team.yds_per_game;
+	if(field == "yds_per_play") return team.yds_per_play;
+	if(field == "first_per_game") return team.first_per_game;
+
+	return 0;
+}
+
+void bsort_command(annual_stats* annualStatsList ,int year, string field,string order) {
 
 	// check year, grab correct index, re-write year as index var, error if no year match
 	for(int n=0; n < numberOfYears; n++ ) {
@@ -314,187 +386,16 @@ void bsort(annual_stats* annualStatsList ,int year,string order) {
 		}
 	}
 
-	if(stat == "team_name"){
-		for(int i = 0; i<32; i++) {
-			dlist[i] = annualStatsList[indexYear].teams[i].team_name;
-		}
+	team_stats* teams = annualStatsList[indexYear].teams;
+	bsort(teams, field, order);
 
-		if(order == "incr") {
-			sortAscChar(dlist);
-		}else {
-			sortDescChar(dlist);
-		}
-
-	}
-
-	if(order == "incr") {
-		//          sortAscChar(clist);
-	}else {
-		//  sortDescChar(clist);
-	}
-
-	if(stat == "games"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].games;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
+	for (int i = 0; i < NO_TEAMS; i++) {
+		if (typeOfField(field) == "float") {
+			cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
+		} else {
+			cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
 		}
 	}
-	if(stat == "pts_per_game"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].pts_per_game;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "total_points"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].total_points;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "scrimmage_plays"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].scrimmage_plays;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "yds_per_game"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].yds_per_game;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "yds_per_play"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].yds_per_play;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "first_per_game"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].games;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "third_md"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].third_md;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "third_att"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].third_att;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "fourth_pct"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].fourth_pct;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "penalties"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].penalties;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	if(stat == "pen_yds"){
-		for(int i = 0; i<32; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].pen_yds;
-		}
-		if(order == "incr") {
-			sortAsc(list);
-		}else {
-			sortDesc(list);
-		}
-	}
-	/*
-	   if(stat == "top_per_game"){
-
-	   for(int i = 0; i<32; i++) {
-	   for(int j = 0; j < 6;j++) {
-	   clist[i][j] = annualStatsList[indexYear].teams[i].top_per_game;
-	   }
-	   }
-//bsortChar(clist);
-}*/
-if(stat == "fum"){
-	for(int i = 0; i<32; i++) {
-		list[i] = annualStatsList[indexYear].teams[i].fum;
-	}
-	if(order == "incr") {
-		sortAsc(list);
-	}else {
-		sortDesc(list);
-	}
-}
-if(stat == "lost"){
-	for(int i = 0; i<32; i++) {
-		list[i] = annualStatsList[indexYear].teams[i].lost;
-	}
-	if(order == "incr") {
-		sortAsc(list);
-	}else {
-		sortDesc(list);
-	}
-}
-if(stat == "to"){
-	for(int i = 0; i<32; i++) {
-		list[i] = annualStatsList[indexYear].teams[i].to;
-	}
-	if(order == "incr") {
-		sortAsc(list);
-	}else {
-		sortDesc(list);
-	}
-}
-cin.clear();
-cin.ignore();
 }
 
 
@@ -555,10 +456,10 @@ main() {
 				year4 = std::atoi(year2.c_str());
 
 			}
-			cin >> stat;
+			cin >> field;
 			cin >> order;
 			if(command == "bsort") {
-				bsort(annualStatsList,year,order);
+				bsort_command(annualStatsList,year,field,order);
 			}else if(command == "bfind") {
 				bfind(annualStatsList,year, order);
 			}
