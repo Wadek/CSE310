@@ -34,7 +34,10 @@ struct annual_stats* annualStatsList;
 
 int getIntFieldValue(team_stats, string);
 float getFloatFieldValue(team_stats, string);
+string getStringFieldValue(team_stats, string);
 string typeOfField(string);
+bool compareFieldValues(team_stats*, string, string, int, int);
+bool equalFieldValues(team_stats*, string, int, int);
 
 //sorts teams alphabetically, by name
 void sortAscChar(string dlist[]){
@@ -99,32 +102,14 @@ void sortAsc(int list[]) {
 
 void bsort(team_stats* teams, string field, string order) {
 	team_stats hold;
-	bool compare, equal;
+	bool compare, isEqual;
 
 	for(int i=0; i<NO_TEAMS-1; i++)
 	{
 		for(int j=0; j<NO_TEAMS-1-i; j++){
-
-			if (order == "decr") {
-				if (typeOfField(field) == "float") {
-					compare = getFloatFieldValue(teams[j], field)<getFloatFieldValue(teams[j+1], field);	
-				} else {
-					compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);	
-				}
-			} else {
-				if (typeOfField(field) == "float") {
-					compare = getFloatFieldValue(teams[j], field)>getFloatFieldValue(teams[j+1], field);	
-				} else {
-					compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);	
-				}
-			}
-			if (typeOfField(field) == "float") {
-				equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);	
-			} else {
-				equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);	
-			}
-
-			if (compare || (equal && strcmp(teams[j].team_name, teams[j+1].team_name) < 0)) {
+			compare = compareFieldValues(teams, field, order, j, j+1); 
+			isEqual = equalFieldValues(teams, field, j, j+1);
+			if (compare || (isEqual && strcmp(teams[j].team_name, teams[j+1].team_name) < 0)) {
 				hold=teams[j];
 				teams[j]=teams[j+1];
 				teams[j+1]=hold;
@@ -346,20 +331,24 @@ int getIntFieldValue(team_stats team, string field) {
 	return -1;
 }
 
-string getStringFieldValue(team_stats* team, string field) {
+string getStringFieldValue(team_stats team, string field) {
 
-	if(field == "team_name") return team->team_name;
-	if(field == "top_per_game") return team->top_per_game;
+	if(field == "team_name") return team.team_name;
+	if(field == "top_per_game") return team.top_per_game;
 
 	return NULL;
 }
 
 string typeOfField(string field) {
 	if(field == "pts_per_game" ||
-	field == "yds_per_game" ||
-	field == "yds_per_play" ||
-	field == "first_per_game") return "float";
-
+			field == "yds_per_game" ||
+			field == "yds_per_play" ||
+			field == "first_per_game") {
+		return "float";
+	} else if (field == "team_name" ||
+			field == "top_per_game") {
+		return "string";
+	}
 	return "int";
 }
 
@@ -373,14 +362,53 @@ float getFloatFieldValue(team_stats team, string field) {
 	return 0;
 }
 
-void bsort_command(annual_stats* annualStatsList ,int year, string field,string order) {
+bool equalFieldValues(team_stats* teams, string field, int j, int k) {
+	bool equal;
+
+	if(typeOfField(field) == "string") {
+		equal = !getStringFieldValue(teams[j], field).compare(getStringFieldValue(teams[j+1], field));
+	} else if(typeOfField(field) == "float") {
+		equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);	
+	} else {
+		equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);	
+	}	
+	return equal;
+}
+
+
+bool compareFieldValues(team_stats* teams, string field, string order, int j, int k) {
+	bool compare;
+
+	if(typeOfField(field) == "string") {
+		if (order == "decr") {
+			compare = strcmp(teams[j].team_name, teams[j+1].team_name) < 0;
+		} else {
+			compare = strcmp(teams[j].team_name, teams[j+1].team_name) > 0;
+		}
+	} else if(typeOfField(field) == "float") {
+		if (order == "decr") {
+			compare = getFloatFieldValue(teams[j], field) < getFloatFieldValue(teams[j+1], field);	
+		} else {
+			compare = getFloatFieldValue(teams[j], field) > getFloatFieldValue(teams[j+1], field);	
+		}
+	} else {
+		if (order == "decr") {
+			compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);	
+		} else {
+			compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);	
+		}
+	}	
+
+	return compare;
+}
+
+void bsort_command(annual_stats* annualStatsList, int year, string field,string order) {
 
 	// check year, grab correct index, re-write year as index var, error if no year match
 	for(int n=0; n < numberOfYears; n++ ) {
 		if(annualStatsList[n].year == whichYear) {
 			indexYear = n;
-		}
-		else {
+		} else {
 			cout<<"Error: no such year." <<endl;
 			break;
 		}
@@ -392,14 +420,18 @@ void bsort_command(annual_stats* annualStatsList ,int year, string field,string 
 	for (int i = 0; i < NO_TEAMS; i++) {
 		if (typeOfField(field) == "float") {
 			cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
+		} else if (typeOfField(field) == "string") {
+			cout<<teams[i].team_name;
+			if(teams[i].team_name != getStringFieldValue(teams[i],field)) {
+				cout<<"\t\t" << getStringFieldValue(teams[i], field);
+			}
+			cout<<endl;
 		} else {
 			cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
 		}
 	}
 }
 
-
-// main execution
 main() {
 	cin >> numberOfYears;
 	annualStatsList = new annual_stats[numberOfYears];
@@ -442,10 +474,8 @@ main() {
 
 		cin >> lines;
 
-		//decides how to treat commands at end of file
 		for(int m = 0;m < lines; m++) {
 			cin >> command;
-			//&field = command;
 			cin >> range;
 			if(range != "range") {
 				year = std::atoi(range.c_str());
