@@ -13,23 +13,8 @@
 
 using namespace std;
 
-int numberOfYears, games, total_points, scrimmage_plays;
-int third_md, third_att, third_pct, fourth_md, fourth_att, fourth_pct, penalties, pen_yds, fum, lost, to;
+int year, numberOfYears, indexYear;
 int whichYear = 0;
-float pts_per_game, yds_per_game, first_per_game;
-string top_per_game;
-string command;
-string range;
-string year1;
-string year2;
-string field;
-string order;
-int lines,year, year3, year4;
-int list[99];
-char clist[25];
-string dlist[NO_TEAMS];
-int indexYear;
-string team_name;
 struct annual_stats* annualStatsList;
 
 int getIntFieldValue(team_stats, string);
@@ -38,6 +23,7 @@ string getStringFieldValue(team_stats, string);
 string typeOfField(string);
 bool compareFieldValues(team_stats*, string, string, int);
 bool equalFieldValues(team_stats*, string, int);
+
 
 void bsort(team_stats* teams, string field, string order) {
 	team_stats hold;
@@ -59,7 +45,9 @@ void bsort(team_stats* teams, string field, string order) {
 	}
 }
 
-void bfind(annual_stats* annualStatsList ,int year,string order) {
+void bfind(annual_stats* annualStatsList, int year, string field, string order) {
+	int list[99];
+	string dlist[NO_TEAMS];
 
 	for(int n=0; n < numberOfYears; n++ ) {
 		if(annualStatsList[n].year == whichYear) {
@@ -320,6 +308,10 @@ void bsort_command(annual_stats* annualStatsList, int year, string field,string 
 }
 
 main() {
+	int commands;
+	string team_name, top_per_game; 
+	string command, range, year1, year2, field, order;
+
 	cin >> numberOfYears;
 	annualStatsList = new annual_stats[numberOfYears];
 
@@ -358,27 +350,23 @@ main() {
 			cin >>annualStatsList->teams[j].lost;
 			cin >>annualStatsList->teams[j].to;
 		}
+		cin >> commands;
 
-		cin >> lines;
-
-		for(int m = 0;m < lines; m++) {
+		for(int m = 0;m < commands; m++) {
 			cin >> command;
 			cin >> range;
 			if(range != "range") {
-				year = std::atoi(range.c_str());
+				year = atoi(range.c_str());
 			} else {
 				cin >> year1;
 				cin >> year2;
-				year3 = std::atoi(year1.c_str());
-				year4 = std::atoi(year2.c_str());
-
 			}
 			cin >> field;
 			cin >> order;
 			if(command == "bsort") {
 				bsort_command(annualStatsList,year,field,order);
 			}else if(command == "bfind") {
-				bfind(annualStatsList,year, order);
+				bfind(annualStatsList,year,field, order);
 			}
 		}
 	}
