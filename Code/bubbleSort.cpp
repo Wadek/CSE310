@@ -36,69 +36,8 @@ int getIntFieldValue(team_stats, string);
 float getFloatFieldValue(team_stats, string);
 string getStringFieldValue(team_stats, string);
 string typeOfField(string);
-bool compareFieldValues(team_stats*, string, string, int, int);
-bool equalFieldValues(team_stats*, string, int, int);
-
-//sorts teams alphabetically, by name
-void sortAscChar(string dlist[]){
-	string hold;
-	for(int i=0; i<31; i++)
-	{
-		for(int j=0; j<31; j++){
-			if(dlist[j]>dlist[j+1]) {
-				hold=dlist[j];
-				dlist[j]=dlist[j+1];
-				dlist[j+1]=hold;
-			}
-		}
-	}
-}
-
-//sorts teams alphabetically, by name, z first
-void sortDescChar(string dlist[]){
-	string hold;
-	for(int i=0; i<19; i++)
-	{
-
-		for(int j=0; j<19; j++){
-			if(dlist[j]<dlist[j+1]) {
-				hold=dlist[j];
-				dlist[j]=dlist[j+1];
-				dlist[j+1]=hold;
-			}
-
-		}
-	}
-}
-
-void sortAsc(int list[]) {
-	int hold;
-
-	for(int i=0; i<NO_TEAMS-1; i++)
-	{
-		for(int j=0; j<NO_TEAMS-1-i; j++){
-			if(list[j]>list[j+1]) {
-				hold=list[j];
-				list[j]=list[j+1];
-				list[j+1]=hold;
-			}
-		}
-	}
-
-	cout<<""<<endl;
-	cout<<"Teams \t\t\t";
-	cout<<"\n"<<endl;
-
-	for(int i=0; i<NO_TEAMS; i++)
-	{
-		cout<<"\t\t\t";
-		if(strlen(annualStatsList[indexYear].teams[i].team_name) < 16) {
-			cout<<"\t";
-		}
-		cout<<list[i]<<endl;
-		cout<<""<<endl;
-	}
-}
+bool compareFieldValues(team_stats*, string, string, int);
+bool equalFieldValues(team_stats*, string, int);
 
 void bsort(team_stats* teams, string field, string order) {
 	team_stats hold;
@@ -107,8 +46,8 @@ void bsort(team_stats* teams, string field, string order) {
 	for(int i=0; i<NO_TEAMS-1; i++)
 	{
 		for(int j=0; j<NO_TEAMS-1-i; j++){
-			compare = compareFieldValues(teams, field, order, j, j+1); 
-			isEqual = equalFieldValues(teams, field, j, j+1);
+			compare = compareFieldValues(teams, field, order, j); 
+			isEqual = equalFieldValues(teams, field, j);
 			if (compare || (isEqual && strcmp(teams[j].team_name, teams[j+1].team_name) < 0)) {
 				hold=teams[j];
 				teams[j]=teams[j+1];
@@ -119,41 +58,6 @@ void bsort(team_stats* teams, string field, string order) {
 
 	}
 }
-
-//bubble sort in descending order
-void sortDesc(int list[]) {
-	int hold;
-
-	for(int i=0; i<NO_TEAMS-1; i++)
-	{
-		for(int j=0; j<NO_TEAMS-1-i; j++){
-			if(list[j]<list[j+1] || (list[j] == list[j+1] && strcmp(annualStatsList[indexYear].teams[j].team_name, annualStatsList[indexYear].teams[j+1].team_name) > 0)) {
-
-				hold=list[j];
-				list[j]=list[j+1];
-				list[j+1]=hold;
-			}
-		}
-
-	}
-
-	cout<<""<<endl;
-	cout<<"Teams \t\t\t\t";
-	cout<<field;
-	cout<<"\n"<<endl;
-
-	for(int i=0; i<NO_TEAMS; i++)
-	{
-		cout<<annualStatsList[indexYear].teams[i].team_name;
-		cout<<"\t\t";
-		if(strlen(annualStatsList[indexYear].teams[i].team_name) < 16) {
-			cout<<"\t";
-		}
-		cout<<list[i]<<endl;
-	}
-	cout<<"\n"<<endl;
-}
-
 
 void bfind(annual_stats* annualStatsList ,int year,string order) {
 
@@ -171,12 +75,6 @@ void bfind(annual_stats* annualStatsList ,int year,string order) {
 		for(int i = 0; i<NO_TEAMS; i++) {
 			dlist[i] = annualStatsList[indexYear].teams[i].team_name;
 		}
-	}
-
-	if(order == "incr") {
-		//          sortAscChar(clist);
-	}else {
-		//  sortDescChar(clist);
 	}
 
 	if(field == "games"){
@@ -239,76 +137,66 @@ void bfind(annual_stats* annualStatsList ,int year,string order) {
 			list[i] = annualStatsList[indexYear].teams[i].pen_yds;
 		}
 	}
-	/*
-	   if(field == "top_per_game"){
-
-	   for(int i = 0; i<NO_TEAMS; i++) {
-	   for(int j = 0; j < 6;j++) {
-	   clist[i][j] = annualStatsList[indexYear].teams[i].top_per_game;
-	   }
-	   }
-//bsortChar(clist);
-}*/
-if(field == "fum"){
-	for(int i = 0; i<NO_TEAMS; i++) {
-		list[i] = annualStatsList[indexYear].teams[i].fum;
-	}
-}
-if(field == "lost"){
-	for(int i = 0; i<NO_TEAMS; i++) {
-		list[i] = annualStatsList[indexYear].teams[i].lost;
-	}
-}
-if(field == "to"){
-	for(int i = 0; i<NO_TEAMS; i++) {
-		list[i] = annualStatsList[indexYear].teams[i].to;
-	}
-}
-
-if(order == "max") {
-	int hold;
-	for(int i=0; i<31; i++)
-	{
-
-		for(int j=0; j<31; j++){
-			if(list[j]<list[j+1]) {
-				hold=list[j];
-				list[j]=list[j+1];
-				list[j+1]=hold;
-			}
+	if(field == "fum"){
+		for(int i = 0; i<NO_TEAMS; i++) {
+			list[i] = annualStatsList[indexYear].teams[i].fum;
 		}
 	}
-	cout<<"Team \t\t\t";
-	cout<<"Max ";
-	cout<<field<<endl;
-	cout<<"\n";
-	cout<<annualStatsList[indexYear].teams[1].team_name;
-	cout<<"\t";
-	cout<<list[1]<<endl;
-	cout<<"\n\n";
-
-}
-if(order =="average") {
-	float total = 0;
-
-	for(int i =0; i < NO_TEAMS; i++) {
-		total = total+list[i];
+	if(field == "lost"){
+		for(int i = 0; i<NO_TEAMS; i++) {
+			list[i] = annualStatsList[indexYear].teams[i].lost;
+		}
 	}
-	float average = total/NO_TEAMS;
-	cout<<"Average ";
-	cout<<field;
-	cout<<"\n\n";
-	cout<< setprecision(4)<<average<<endl;
-	cout <<"\n";
+	if(field == "to"){
+		for(int i = 0; i<NO_TEAMS; i++) {
+			list[i] = annualStatsList[indexYear].teams[i].to;
+		}
+	}
 
-}
+	if(order == "max") {
+		int hold;
+		for(int i=0; i<31; i++)
+		{
 
-if(order =="min") {
-	cout<<"should be min"<<endl;
-	cout<<order<<endl;
-}
-cin.clear();
-cin.ignore();
+			for(int j=0; j<31; j++){
+				if(list[j]<list[j+1]) {
+					hold=list[j];
+					list[j]=list[j+1];
+					list[j+1]=hold;
+				}
+			}
+		}
+		cout<<"Team \t\t\t";
+		cout<<"Max ";
+		cout<<field<<endl;
+		cout<<"\n";
+		cout<<annualStatsList[indexYear].teams[1].team_name;
+		cout<<"\t";
+		cout<<list[1]<<endl;
+		cout<<"\n\n";
+
+	}
+	if(order =="average") {
+		float total = 0;
+
+		for(int i =0; i < NO_TEAMS; i++) {
+			total = total+list[i];
+		}
+		float average = total/NO_TEAMS;
+		cout<<"Average ";
+		cout<<field;
+		cout<<"\n\n";
+		cout<< setprecision(4)<<average<<endl;
+		cout <<"\n";
+
+	}
+
+	if(order =="min") {
+		cout<<"should be min"<<endl;
+		cout<<order<<endl;
+	}
+	cin.clear();
+	cin.ignore();
 }
 
 int getIntFieldValue(team_stats team, string field) {
@@ -362,7 +250,7 @@ float getFloatFieldValue(team_stats team, string field) {
 	return 0;
 }
 
-bool equalFieldValues(team_stats* teams, string field, int j, int k) {
+bool equalFieldValues(team_stats* teams, string field, int j) {
 	bool equal;
 
 	if(typeOfField(field) == "string") {
@@ -376,7 +264,7 @@ bool equalFieldValues(team_stats* teams, string field, int j, int k) {
 }
 
 
-bool compareFieldValues(team_stats* teams, string field, string order, int j, int k) {
+bool compareFieldValues(team_stats* teams, string field, string order, int j) {
 	bool compare;
 
 	if(typeOfField(field) == "string") {
@@ -398,7 +286,6 @@ bool compareFieldValues(team_stats* teams, string field, string order, int j, in
 			compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);	
 		}
 	}	
-
 	return compare;
 }
 
