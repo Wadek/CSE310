@@ -12,7 +12,6 @@
 using namespace std;
 
 int year, numberOfYears, indexYear;
-int whichYear = 0;
 struct annual_stats* annualStatsList;
 
 int getIntFieldValue(team_stats, string);
@@ -21,7 +20,6 @@ string getStringFieldValue(team_stats, string);
 string typeOfField(string);
 bool compareFieldValues(team_stats*, string, string, int);
 bool equalFieldValues(team_stats*, string, int);
-
 
 void bsort(team_stats* teams, string field, string order) {
     team_stats hold;
@@ -43,19 +41,70 @@ void bsort(team_stats* teams, string field, string order) {
     }
 }
 
+bool compareFieldValues(team_stats* teams, string field, string order, int j) {
+    bool compare;
+
+    if(typeOfField(field) == "string") {
+        if (order == "decr") {
+            compare = strcmp(teams[j].team_name, teams[j+1].team_name) < 0;
+        } else {
+            compare = strcmp(teams[j].team_name, teams[j+1].team_name) > 0;
+        }
+    } else if(typeOfField(field) == "float") {
+        if (order == "decr") {
+            compare = getFloatFieldValue(teams[j], field) < getFloatFieldValue(teams[j+1], field);
+        } else {
+            compare = getFloatFieldValue(teams[j], field) > getFloatFieldValue(teams[j+1], field);
+        }
+    } else {
+        if (order == "decr") {
+            compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);
+        } else {
+            compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);
+        }
+    }
+    return compare;
+}
+
+bool equalFieldValues(team_stats* teams, string field, int j) {
+    bool equal;
+
+    if(typeOfField(field) == "string") {
+        equal = !getStringFieldValue(teams[j], field).compare(getStringFieldValue(teams[j+1], field));
+    } else if(typeOfField(field) == "float") {
+        equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);
+    } else {
+        equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);
+    }
+    return equal;
+}
+
+void bsort_command(annual_stats* annualStatsList, int year, string field,string order) {
+
+    team_stats* teams = annualStatsList[year - 2010].teams;
+    bsort(teams, field, order);
+
+    cout<<"\n"<<"Team"<<"\t\t\t\t"<<field<<"\n"<<endl;
+    for (int i = 0; i < NO_TEAMS; i++) {
+        if (typeOfField(field) == "float") {
+            cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
+        } else if (typeOfField(field) == "string") {
+            cout<<teams[i].team_name;
+            if(teams[i].team_name != getStringFieldValue(teams[i],field)) {
+                cout<<"\t\t" << getStringFieldValue(teams[i], field);
+            }
+            cout<<endl;
+        } else {
+            cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+        }
+    }
+    cin.clear();
+}
+
 void bfind(annual_stats* annualStatsList, int year, string field, string order) {
     int list[99];
     string dlist[NO_TEAMS];
-
-    for(int n=0; n < numberOfYears; n++ ) {
-        if(annualStatsList[n].year == whichYear) {
-            indexYear = n;
-        }
-        else {
-            cout<<"Error: no such year." <<endl;
-            break;
-        }
-    }
+    indexYear = year-2010;
 
     if(field == "team_name"){
         for(int i = 0; i<NO_TEAMS; i++) {
@@ -152,9 +201,7 @@ void bfind(annual_stats* annualStatsList, int year, string field, string order) 
                 }
             }
         }
-        cout<<"Team \t\t\t";
-        cout<<"Max ";
-        cout<<field<<endl;
+        cout<<"\n"<<"Team \t\t\t"<<"Max "<<field<<endl;
         cout<<"\n";
         cout<<annualStatsList[indexYear].teams[1].team_name;
         cout<<"\t";
@@ -236,90 +283,18 @@ float getFloatFieldValue(team_stats team, string field) {
     return 0;
 }
 
-bool equalFieldValues(team_stats* teams, string field, int j) {
-    bool equal;
-
-    if(typeOfField(field) == "string") {
-        equal = !getStringFieldValue(teams[j], field).compare(getStringFieldValue(teams[j+1], field));
-    } else if(typeOfField(field) == "float") {
-        equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);
-    } else {
-        equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);
-    }
-    return equal;
-}
-
-
-bool compareFieldValues(team_stats* teams, string field, string order, int j) {
-    bool compare;
-
-    if(typeOfField(field) == "string") {
-        if (order == "decr") {
-            compare = strcmp(teams[j].team_name, teams[j+1].team_name) < 0;
-        } else {
-            compare = strcmp(teams[j].team_name, teams[j+1].team_name) > 0;
-        }
-    } else if(typeOfField(field) == "float") {
-        if (order == "decr") {
-            compare = getFloatFieldValue(teams[j], field) < getFloatFieldValue(teams[j+1], field);
-        } else {
-            compare = getFloatFieldValue(teams[j], field) > getFloatFieldValue(teams[j+1], field);
-        }
-    } else {
-        if (order == "decr") {
-            compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);
-        } else {
-            compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);
-        }
-    }
-    return compare;
-}
-
-void bsort_command(annual_stats* annualStatsList, int year, string field,string order) {
-
-    // check year, grab correct index, re-write year as index var, error if no year match
-    for(int n=0; n < numberOfYears; n++ ) {
-        if(annualStatsList[n].year == whichYear) {
-            indexYear = n;
-        } else {
-            cout<<"Error: no such year." <<endl;
-            break;
-        }
-    }
-
-    team_stats* teams = annualStatsList[indexYear].teams;
-    bsort(teams, field, order);
-
-    cout<<"\n"<<"Team"<<"\t\t\t\t"<<field<<"\n"<<endl;
-    for (int i = 0; i < NO_TEAMS; i++) {
-        if (typeOfField(field) == "float") {
-            cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
-        } else if (typeOfField(field) == "string") {
-            cout<<teams[i].team_name;
-            if(teams[i].team_name != getStringFieldValue(teams[i],field)) {
-                cout<<"\t\t" << getStringFieldValue(teams[i], field);
-            }
-            cout<<endl;
-        } else {
-            cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
-        }
-    }
-}
-
 main() {
-    int commands;
+    int numberOfCommands, structYear;
     string command, range, year1, year2, field, order;
-
 
     cin >> numberOfYears;
     annualStatsList = new annual_stats[numberOfYears];
 
-    //takes in file as if it were a user inputting data
     for(int i = 0; i < numberOfYears; i++) {
-        cin >> annualStatsList[i].year;
+        cin >> structYear;
+        annualStatsList[i].year = structYear;
         for(int j = 0; j < NO_TEAMS; j++ ) {
 
-            string tm;
             string team_name = "";
             string top_per_game = "";
             string tempString = "";
@@ -331,23 +306,23 @@ main() {
             }
             while(tempString.at(tempString.length()-1) != '\"');
 
-            strcpy(annualStatsList->teams[j].team_name, team_name.c_str());
+            strcpy(annualStatsList[i].teams[j].team_name, team_name.c_str());
             //team_name.erase(remove( team_name.begin(), team_name.end(), '\"' ),team_name.end());
-            cin >> annualStatsList->teams[j].games;
-            cin >> annualStatsList->teams[j].pts_per_game;
-            cin >> annualStatsList->teams[j].total_points;
-            cin >> annualStatsList->teams[j].scrimmage_plays;
-            cin >> annualStatsList->teams[j].yds_per_game;
-            cin >> annualStatsList->teams[j].yds_per_play;
-            cin >> annualStatsList->teams[j].first_per_game;
-            cin >> annualStatsList->teams[j].third_md;
-            cin >> annualStatsList->teams[j].third_att;
-            cin >> annualStatsList->teams[j].third_pct;
-            cin >> annualStatsList->teams[j].fourth_md;
-            cin >> annualStatsList->teams[j].fourth_att;
-            cin >> annualStatsList->teams[j].fourth_pct;
-            cin >> annualStatsList->teams[j].penalties;
-            cin >> annualStatsList->teams[j].pen_yds;
+            cin >> annualStatsList[i].teams[j].games;
+            cin >> annualStatsList[i].teams[j].pts_per_game;
+            cin >> annualStatsList[i].teams[j].total_points;
+            cin >> annualStatsList[i].teams[j].scrimmage_plays;
+            cin >> annualStatsList[i].teams[j].yds_per_game;
+            cin >> annualStatsList[i].teams[j].yds_per_play;
+            cin >> annualStatsList[i].teams[j].first_per_game;
+            cin >> annualStatsList[i].teams[j].third_md;
+            cin >> annualStatsList[i].teams[j].third_att;
+            cin >> annualStatsList[i].teams[j].third_pct;
+            cin >> annualStatsList[i].teams[j].fourth_md;
+            cin >> annualStatsList[i].teams[j].fourth_att;
+            cin >> annualStatsList[i].teams[j].fourth_pct;
+            cin >> annualStatsList[i].teams[j].penalties;
+            cin >> annualStatsList[i].teams[j].pen_yds;
 
             do{
                 cin >> tempString;
@@ -356,31 +331,31 @@ main() {
             }
             while(tempString.at(tempString.length()-1) != '\"');
             top_per_game.erase(remove( top_per_game.begin(), top_per_game.end(), ' ' ));
-            strcpy(annualStatsList->teams[j].top_per_game, top_per_game.c_str());
+            strcpy(annualStatsList[i].teams[j].top_per_game, top_per_game.c_str());
 
-            cin >>annualStatsList->teams[j].fum;
-            cin >>annualStatsList->teams[j].lost;
-            cin >>annualStatsList->teams[j].to;
+            cin >>annualStatsList[i].teams[j].fum;
+            cin >>annualStatsList[i].teams[j].lost;
+            cin >>annualStatsList[i].teams[j].to;
         }
     }
-       cin >> commands;
+    cin >> numberOfCommands;
 
-       for(int m = 0;m < commands; m++) {
-       cin >> command;
-       cin >> range;
-       if(range != "range") {
-       year = atoi(range.c_str());
-       } else {
-       cin >> year1;
-       cin >> year2;
-       }
-       cin >> field;
-       cin >> order;
-       if(command == "bsort") {
-       bsort_command(annualStatsList,year,field,order);
-       }else if(command == "bfind") {
-       bfind(annualStatsList,year,field, order);
-       }
-       }
+    for(int m = 0;m < numberOfCommands; m++) {
+        cin >> command;
+        cin >> range;
+        if(range != "range") {
+            year = atoi(range.c_str());
+        } else {
+            cin >> year1;
+            cin >> year2;
+        }
+        cin >> field;
+        cin >> order;
+        if(command == "bsort") {
+            bsort_command(annualStatsList,year,field,order);
+        }else if(command == "bfind") {
+            bfind(annualStatsList,year,field, order);
+        }
+        //flush buffer here
+    }
 }
-
