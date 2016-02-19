@@ -11,7 +11,8 @@
 
 using namespace std;
 
-int year,endYear, numberOfYears, indexYear;
+int year,endYear, indexYear,structYear;
+int numberOfYears = 0;
 struct annual_stats* annualStatsList;
 
 int getIntFieldValue(team_stats, string);
@@ -80,13 +81,20 @@ bool equalFieldValues(team_stats* teams, string field, int j) {
 }
 
 void bsort_command(annual_stats* annualStatsList, int year, int endYear, string field,string order) {
-    team_stats* teams = annualStatsList[year - 2010].teams;
 
-    if(endYear) {
-        for(int i = 0; i < endYear - 2010; i++) {
-            team_stats* teams = annualStatsList[year+i - 2010].teams;
+            team_stats* teams = annualStatsList[0].teams;
+            cout<<"year: "<<year<<endl;
+    for(int i = 0; i < numberOfYears;i++) {
+        if(structYear == year){
+            team_stats* teams = annualStatsList[i].teams;
         }
     }
+
+    /*if(endYear) {
+      for(int i = 0; i < endYear - 2010; i++) {
+      team_stats* teams = annualStatsList[year+i - 2010].teams;
+      }
+      }*/
     bsort(teams, field, order);
 
     cout<<"\n"<<"Team"<<"\t\t\t\t"<<field<<"\n"<<endl;
@@ -290,8 +298,9 @@ float getFloatFieldValue(team_stats team, string field) {
 }
 
 main() {
-    int numberOfCommands, structYear;
+    int numberOfCommands;
     string command, range,field, order;
+    cout<< "here"<<endl;
 
     cin >> numberOfYears;
     annualStatsList = new annual_stats[numberOfYears];
@@ -350,7 +359,7 @@ main() {
         cin >> command;
         cin >> range;
         if(range != "range") {
-            year = atoi(range.c_str());
+            year =  atoi(range.c_str());
         } else {
             cin >> year;
             cin >> endYear;
