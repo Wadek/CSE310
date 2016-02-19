@@ -23,10 +23,8 @@ struct team_stats{
     int fum; // Number of fumbles
     int lost; // Fumbles lost
     int to; // Turnover ratio
-
 };
 struct annual_stats{
     int year;
     struct team_stats teams[ NO_TEAMS  ];
-
 };
