@@ -47,7 +47,6 @@ void bsort(team_stats* teams, string field, string order) {
 
 void sort_command(annual_stats* annualStatsList, int year, int endYear, string field,string order) {
 
-	int median = 0;
 	int years = (1+(endYear - year));
 	rangeYear = years*NO_TEAMS;
 	team_stats* teams = new team_stats[rangeYear];
@@ -60,21 +59,17 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
 		teams = annualStatsList[year-2010].teams;
 	}
 
+	bsort(teams, field, order);
+
 	if(order == "max" || order=="min" ||order == "average" || order =="median") {
 		string tempOrder = "";
 		float average = 0;
 		int median = 0;
 
-		if(order =="max") {
-			tempOrder = "max";
-			order = "decr";
-		}
-		else if(order =="min") {
-			tempOrder = "min";
-			order = "incr";
-		}
-		else if(order =="average") {
+
+		if(order =="average") {
 			tempOrder = "average";
+	
 			float total = 0;
 			if (typeOfField(field) == "float") {
 				teams[0].team_name;
@@ -87,27 +82,16 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
 					total = total + getIntFieldValue(teams[i], field);
 				}
 			}
-
 			for(int i =0; i < rangeYear; i++) {
 				total = total + getIntFieldValue(teams[i], field);
 			}
 			average = total/rangeYear;
+			cout<<"\n"<<tempOrder<<" "<<field<<"\n"<<setprecision(4)<<average<<endl;
 		}
 		else if(order =="median") {
 			tempOrder = "median";
-			order = "incr";
 			median = rangeYear - rangeYear/2;
-
-		}
-
-		bsort(teams, field, order);
-
-		if(tempOrder == "average") {
-			cout<<"\n"<<tempOrder<<" "<<field<<"\n"<<average<<endl;
-		}
-		else if(tempOrder =="median") {
 			cout<<"\n"<<tempOrder<<" "<<field<<"\n";
-
 			if (typeOfField(field) == "float") {
 				cout<< getFloatFieldValue(teams[median], field) <<endl;
 			} else if (typeOfField(field) == "string") {
@@ -127,8 +111,13 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
 			cout<<endl;
 
 		}
-	
-		else{
+		else if(order =="max" || order =="min") {
+			tempOrder = "min";
+			if(order =="max") {
+				tempOrder = "max";
+				order = "decr";
+				bsort(teams, field, order);
+			}
 			cout<<"\n"<<tempOrder<<" "<<field<<endl;
 			if (typeOfField(field) == "float") {
 				cout<< getFloatFieldValue(teams[0], field) <<endl;
@@ -150,11 +139,15 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
 		}
 	}
 	else {
-		bsort(teams, field, order);
-		cout<<"\n"<<"Team"<<"\t\t\t\t"<<field<<"\n"<<endl;
+		cout<<"\n"<<"Team"<<"\t\t\t"<<field<<"\t\t";
+		if(year != endYear) {cout<<"Year";}
+		cout<<"\n"<<endl;
 		for (int i = 0; i < rangeYear; i++) {
 			if (typeOfField(field) == "float") {
-				cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
+				cout<<teams[i].team_name<< "\t\t"; 
+				float tempFloat = getFloatFieldValue(teams[i], field);
+				cout<<setprecision(4)<<tempFloat<<endl;
+
 			} else if (typeOfField(field) == "string") {
 				cout<<teams[i].team_name;
 				if(teams[i].team_name != getStringFieldValue(teams[i],field)) {
@@ -162,11 +155,12 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
 				}
 				cout<<endl;
 			} else {
+				cout<<teams[i].team_name<< "\t\t";
 				if(year != endYear) {
-					cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+					 cout<<getIntFieldValue(teams[i], field)<<"\t\t"<<annualStatsList[0].year<<endl;
 				}
 				else {
-					cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+					cout<< getIntFieldValue(teams[i], field)<<endl;
 				}
 			}
 		}
@@ -228,7 +222,6 @@ int getIntFieldValue(team_stats team, string field) {
 	if(field == "fum") return team.fum;
 	if(field == "lost") return team.lost;
 	if(field == "to") return team.to;
-
 	return -1;
 }
 
@@ -236,7 +229,6 @@ string getStringFieldValue(team_stats team, string field) {
 
 	if(field == "team_name") return team.team_name;
 	if(field == "top_per_game") return team.top_per_game;
-
 	return NULL;
 }
 
@@ -259,7 +251,6 @@ float getFloatFieldValue(team_stats team, string field) {
 	if(field == "yds_per_game") return team.yds_per_game;
 	if(field == "yds_per_play") return team.yds_per_play;
 	if(field == "first_per_game") return team.first_per_game;
-
 	return 0;
 }
 
