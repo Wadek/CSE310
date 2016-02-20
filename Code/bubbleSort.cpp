@@ -45,8 +45,9 @@ void bsort(team_stats* teams, string field, string order) {
     }
 }
 
-void bsort_command(annual_stats* annualStatsList, int year, int endYear, string field,string order) {
+void sort_command(annual_stats* annualStatsList, int year, int endYear, string field,string order) {
 
+	int median = 0;
 	int years = (1+(endYear - year));
 	rangeYear = years*NO_TEAMS;
 	team_stats* teams = new team_stats[rangeYear];
@@ -59,24 +60,114 @@ void bsort_command(annual_stats* annualStatsList, int year, int endYear, string 
 		teams = annualStatsList[year-2010].teams;
 	}
 
-	bsort(teams, field, order);
+	if(order == "max" || order=="min" ||order == "average" || order =="median") {
+		string tempOrder = "";
+		float average = 0;
+		int median = 0;
 
-	cout<<"\n"<<"Team"<<"\t\t\t\t"<<field<<"\n"<<endl;
-	for (int i = 0; i < rangeYear; i++) {
-		if (typeOfField(field) == "float") {
-			cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
-		} else if (typeOfField(field) == "string") {
-			cout<<teams[i].team_name;
-			if(teams[i].team_name != getStringFieldValue(teams[i],field)) {
-				cout<<"\t\t" << getStringFieldValue(teams[i], field);
+		if(order =="max") {
+			tempOrder = "max";
+			order = "decr";
+		}
+		else if(order =="min") {
+			tempOrder = "min";
+			order = "incr";
+		}
+		else if(order =="average") {
+			tempOrder = "average";
+			float total = 0;
+			if (typeOfField(field) == "float") {
+				teams[0].team_name;
+				for(int i =0; i < rangeYear; i++) {
+					total = total + getFloatFieldValue(teams[i], field);
+				}
+			} else {
+				teams[0].team_name;
+				for(int i =0; i < rangeYear; i++) {
+					total = total + getIntFieldValue(teams[i], field);
+				}
+			}
+
+			for(int i =0; i < rangeYear; i++) {
+				total = total + getIntFieldValue(teams[i], field);
+			}
+			average = total/rangeYear;
+		}
+		else if(order =="median") {
+			tempOrder = "median";
+			order = "incr";
+			median = rangeYear - rangeYear/2;
+
+		}
+
+		bsort(teams, field, order);
+
+		if(tempOrder == "average") {
+			cout<<"\n"<<tempOrder<<" "<<field<<"\n"<<average<<endl;
+		}
+		else if(tempOrder =="median") {
+			cout<<"\n"<<tempOrder<<" "<<field<<"\n";
+
+			if (typeOfField(field) == "float") {
+				cout<< getFloatFieldValue(teams[median], field) <<endl;
+			} else if (typeOfField(field) == "string") {
+				cout<<teams[median].team_name;
+				if(teams[median].team_name != getStringFieldValue(teams[median],field)) {
+					cout<<"\t\t" << getStringFieldValue(teams[median], field);
+				}
+				cout<<endl;
+			} else {
+				if(year != endYear) {
+					cout << getIntFieldValue(teams[16], field) <<endl;
+				}
+				else {
+					cout<< getIntFieldValue(teams[16], field) <<endl;
+				}
 			}
 			cout<<endl;
-		} else {
-			if(year != endYear) {
-				cout<<"\t"<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+
+		}
+	
+		else{
+			cout<<"\n"<<tempOrder<<" "<<field<<endl;
+			if (typeOfField(field) == "float") {
+				cout<< getFloatFieldValue(teams[0], field) <<endl;
+			} else if (typeOfField(field) == "string") {
+				cout<<teams[0].team_name;
+				if(teams[0].team_name != getStringFieldValue(teams[0],field)) {
+					cout<<"\t\t" << getStringFieldValue(teams[0], field);
+				}
+				cout<<endl;
+			} else {
+				if(year != endYear) {
+					cout<<teams[0].team_name<< "\t\t" << getIntFieldValue(teams[0], field) <<endl;
+				}
+				else {
+					cout<<teams[0].team_name<< "\t\t" << getIntFieldValue(teams[0], field) <<endl;
+				}
 			}
-			else {
-				cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+
+		}
+	}
+	else {
+		bsort(teams, field, order);
+		cout<<"\n"<<"Team"<<"\t\t\t\t"<<field<<"\n"<<endl;
+		for (int i = 0; i < rangeYear; i++) {
+			if (typeOfField(field) == "float") {
+				cout<<teams[i].team_name<< "\t\t" << getFloatFieldValue(teams[i], field) <<endl;
+			} else if (typeOfField(field) == "string") {
+				cout<<teams[i].team_name;
+				if(teams[i].team_name != getStringFieldValue(teams[i],field)) {
+					cout<<"\t\t" << getStringFieldValue(teams[i], field);
+				}
+				cout<<endl;
+			} else {
+				if(year != endYear) {
+					cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+				}
+				else {
+					cout<<teams[i].team_name<< "\t\t" << getIntFieldValue(teams[i], field) <<endl;
+				}
 			}
 		}
 	}
@@ -84,174 +175,41 @@ void bsort_command(annual_stats* annualStatsList, int year, int endYear, string 
 }
 
 bool compareFieldValues(team_stats* teams, string field, string order, int j) {
-    bool compare;
+	bool compare;
 
-    if(typeOfField(field) == "string") {
-        if (order == "decr") {
-            compare = strcmp(teams[j].team_name, teams[j+1].team_name) < 0;
-        } else {
-            compare = strcmp(teams[j].team_name, teams[j+1].team_name) > 0;
-        }
-    } else if(typeOfField(field) == "float") {
-        if (order == "decr") {
-            compare = getFloatFieldValue(teams[j], field) < getFloatFieldValue(teams[j+1], field);
-        } else {
-            compare = getFloatFieldValue(teams[j], field) > getFloatFieldValue(teams[j+1], field);
-        }
-    } else {
-        if (order == "decr") {
-            compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);
-        } else {
-            compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);
-        }
-    }
-    return compare;
+	if(typeOfField(field) == "string") {
+		if (order == "decr") {
+			compare = strcmp(teams[j].team_name, teams[j+1].team_name) < 0;
+		} else {
+			compare = strcmp(teams[j].team_name, teams[j+1].team_name) > 0;
+		}
+	} else if(typeOfField(field) == "float") {
+		if (order == "decr") {
+			compare = getFloatFieldValue(teams[j], field) < getFloatFieldValue(teams[j+1], field);
+		} else {
+			compare = getFloatFieldValue(teams[j], field) > getFloatFieldValue(teams[j+1], field);
+		}
+	} else {
+		if (order == "decr") {
+			compare = getIntFieldValue(teams[j], field)<getIntFieldValue(teams[j+1], field);
+		} else {
+			compare = getIntFieldValue(teams[j], field)>getIntFieldValue(teams[j+1], field);
+		}
+	}
+	return compare;
 }
 
 bool equalFieldValues(team_stats* teams, string field, int j) {
-    bool equal;
+	bool equal;
 
-    if(typeOfField(field) == "string") {
-        equal = !getStringFieldValue(teams[j], field).compare(getStringFieldValue(teams[j+1], field));
-    } else if(typeOfField(field) == "float") {
-        equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);
-    } else {
-        equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);
-    }
-    return equal;
-}
-
-
-
-void bfind(annual_stats* annualStatsList, int year, string field, string order) {
-	int list[99];
-	string dlist[NO_TEAMS];
-	indexYear = year-2010;
-
-	if(field == "team_name"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			dlist[i] = annualStatsList[indexYear].teams[i].team_name;
-		}
+	if(typeOfField(field) == "string") {
+		equal = !getStringFieldValue(teams[j], field).compare(getStringFieldValue(teams[j+1], field));
+	} else if(typeOfField(field) == "float") {
+		equal = getFloatFieldValue(teams[j], field) == getFloatFieldValue(teams[j+1], field);
+	} else {
+		equal = getIntFieldValue(teams[j], field) == getIntFieldValue(teams[j+1], field);
 	}
-
-	if(field == "games"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].games;
-		}
-	}
-	if(field == "pts_per_game"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].pts_per_game;
-		}
-	}
-	if(field == "total_points"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].total_points;
-		}
-	}
-	if(field == "scrimmage_plays"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].scrimmage_plays;
-		}
-	}
-	if(field == "yds_per_game"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].yds_per_game;
-		}
-	}
-	if(field == "yds_per_play"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].yds_per_play;
-		}
-	}
-	if(field == "first_per_game"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].games;
-		}
-	}
-	if(field == "third_md"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].third_md;
-		}
-	}
-	if(field == "third_att"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].third_att;
-		}
-	}
-	if(field == "fourth_pct"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].fourth_pct;
-		}
-	}
-	if(field == "penalties"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].penalties;
-		}
-	}
-	if(field == "pen_yds"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].pen_yds;
-		}
-	}
-	if(field == "fum"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].fum;
-		}
-	}
-	if(field == "lost"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].lost;
-		}
-	}
-	if(field == "to"){
-		for(int i = 0; i<NO_TEAMS; i++) {
-			list[i] = annualStatsList[indexYear].teams[i].to;
-		}
-	}
-
-	if(order == "max") {
-		int hold;
-		for(int i=0; i<31; i++)
-		{
-
-			for(int j=0; j<31; j++){
-				if(list[j]<list[j+1]) {
-					hold=list[j];
-					list[j]=list[j+1];
-					list[j+1]=hold;
-				}
-			}
-		}
-		cout<<"\n"<<"Team \t\t\t"<<"Max "<<field<<endl;
-		cout<<"\n";
-		cout<<annualStatsList[indexYear].teams[1].team_name;
-		cout<<"\t";
-		cout<<list[1]<<endl;
-		cout<<"\n\n";
-
-	}
-	if(order =="average") {
-		float total = 0;
-
-		for(int i =0; i < NO_TEAMS; i++) {
-			total = total+list[i];
-		}
-		float average = total/NO_TEAMS;
-		cout<<"Average ";
-		cout<<field;
-		cout<<"\n\n";
-		cout<< setprecision(4)<<average<<endl;
-		cout <<"\n";
-
-	}
-
-	if(order =="min") {
-		cout<<"should be min"<<endl;
-		cout<<order<<endl;
-	}
-	cin.clear();
-	cin.ignore();
+	return equal;
 }
 
 int getIntFieldValue(team_stats team, string field) {
@@ -372,11 +330,7 @@ main() {
 		}
 		cin >> field;
 		cin >> order;
-		if(command == "bsort") {
-			bsort_command(annualStatsList,year,endYear,field,order);
-		}else if(command == "bfind") {
-			bfind(annualStatsList,year,field, order);
-		}
+		sort_command(annualStatsList,year,endYear,field,order);
 		cin.clear();
 		cin.ignore();
 	}
