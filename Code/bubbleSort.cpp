@@ -49,16 +49,45 @@ void bsort(team_stats* teams, string field, string order) {
 
 void quicksort(team_stats* teams, int l, int r,string field, string order) {
     int i = l, j =r;
-    int pivot = getIntFieldValue(teams[(l+r)/ 2], field);
     team_stats hold;
-    bool compare;
+    bool compare, isEqual;
 
     while(i <= j) {
-        while(getIntFieldValue(teams[i], field) < pivot) {
-            i++;
+        if(typeOfField(field) == "int") {
+            int pivot = getIntFieldValue(teams[l], field);
+            if(order == "incr") {
+                while(getIntFieldValue(teams[i], field) < pivot) {
+                    i++;
+                }
+                while(getIntFieldValue(teams[j], field) > pivot) {
+                    j--;
+                }
+            }else {
+                while(getIntFieldValue(teams[i], field) > pivot) {
+                    i++;
+                }
+                while(getIntFieldValue(teams[j], field) < pivot) {
+                    j--;
+                }
+
+            }
         }
-        while(getIntFieldValue(teams[j], field) > pivot) {
-            j--;
+        else if(typeOfField(field) == "string") {
+            if(order =="incr") {
+            while(strcmp(teams[i].team_name, teams[l].team_name) < 0) {
+                i++;
+            }
+            while(strcmp(teams[j].team_name, teams[l].team_name) > 0) {
+                j--;
+            }
+            } else {
+            while(strcmp(teams[i].team_name, teams[l].team_name) > 0) {
+                i++;
+            }
+            while(strcmp(teams[j].team_name, teams[l].team_name) < 0) {
+                j--;
+            }
+            }
         }
         if(i <= j){
             hold = teams[i];
@@ -68,7 +97,7 @@ void quicksort(team_stats* teams, int l, int r,string field, string order) {
             j--;
         }
     }
-    if(l < i) {
+    if(l < j) {
         quicksort(teams,l,j,field,order);
     }
     if(i < r) {
@@ -76,9 +105,10 @@ void quicksort(team_stats* teams, int l, int r,string field, string order) {
     }
 }
 
+
 void qsort(team_stats* teams, string field, string order) {
     int i = 0;
-    int j = rangeYear;
+    int j = rangeYear-1;
     quicksort(teams,i,j,field,order);
 }
 
@@ -89,17 +119,18 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
     team_stats* teams = new team_stats[rangeYear];
 
     if(year != endYear) {
+
         for(int i = 0; i < rangeYear; i++) {
             teams[i] = annualStatsList[i/NO_TEAMS].teams[i%NO_TEAMS];
         }
     } else {
-        teams = annualStatsList[year-2010].teams;
+        teams = annualStatsList[0].teams;
     }
 
-    if(command =="qsort") {
+    if(command =="qsort" | command == "qfind") {
         qsort(teams,field,order);
     }
-    else {
+    else if(command =="bsort" | command == "bfind"){
         bsort(teams, field, order);
     }
 
@@ -130,7 +161,7 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
         }
         else if(order =="median") {
             tempOrder = "median";
-            median = rangeYear - rangeYear/2;
+            median = rangeYear - (rangeYear/2);
             cout<<"\n"<<tempOrder<<" "<<field<<"\n";
             if (typeOfField(field) == "float") {
                 cout<< getFloatFieldValue(teams[median], field) <<endl;
@@ -179,8 +210,8 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
         }
     }
     else {
-        cout<<"\n"<<"Team"<<"\t\t\t"<<field<<"\t\t";
-        if(year != endYear) {cout<<"Year";}
+        cout<<"\n"<<"Team"<<"\t\t\t"<<field;
+        if(year != endYear) {cout<<"\t\t\t\t"<<"Year";}
         cout<<"\n"<<endl;
         for (int i = 0; i < rangeYear; i++) {
             if (typeOfField(field) == "float") {
@@ -208,7 +239,6 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
     cin.clear();
 }
 
-//runs a comparison by calling getIntFieldValue, which returns 1,0 depending on which value is greater. returns boolean
 bool compareFieldValues(team_stats* teams, string field, string order, int j) {
     bool compare;
 
@@ -300,6 +330,7 @@ main() {
     string range,field, order;
     cin >> numberOfYears;
     annualStatsList = new annual_stats[numberOfYears];
+
 
     for(int i = 0; i < numberOfYears; i++) {
         cin >> structYear;
