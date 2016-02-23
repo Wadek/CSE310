@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <stdlib.h>
 #include <stdio.h>
+#include <omp.h>
 #include "defns.cc"
 
 using namespace std;
@@ -26,6 +27,51 @@ string getStringFieldValue(team_stats, string);
 string typeOfField(string);
 bool compareFieldValues(team_stats*, string, string, int);
 bool equalFieldValues(team_stats*, string, int);
+
+void pmax(team_stats* teams, string field, string order) {
+    team_stats hold;
+    bool compare, isEqual;
+    int i = 0;
+    int j = 0;
+
+#pragma omp parallel shared(rangeYear) private(i,j) num_threads(2)
+    {
+        if(command == "pmin") {
+#pragma omp for
+            for(i=0; i<rangeYear-1; i++)
+            {
+                for(j=0; j<rangeYear-1-i; j++){
+                    compare = compareFieldValues(teams, field, order, j);
+                    isEqual = equalFieldValues(teams, field, j);
+                    if (compare || (isEqual && strcmp(teams[j].team_name, teams[j+1].team_name) < 0)) {
+                        hold=teams[j];
+                        teams[j]=teams[j+1];
+                        teams[j+1]=hold;
+                    }
+
+                }
+
+            }
+        }
+        else {
+#pragma omp for
+            for(i=0; i<rangeYear-1; i++)
+            {
+                for(j=0; j<rangeYear-1-i; j++){
+                    compare = compareFieldValues(teams, field, order, j);
+                    isEqual = equalFieldValues(teams, field, j);
+                    if (compare || (isEqual && strcmp(teams[j].team_name, teams[j+1].team_name) > 0)) {
+                        hold=teams[j];
+                        teams[j]=teams[j+1];
+                        teams[j+1]=hold;
+                    }
+
+                }
+
+            }
+        }
+    }
+}
 
 void bsort(team_stats* teams, string field, string order) {
     team_stats hold;
@@ -46,6 +92,7 @@ void bsort(team_stats* teams, string field, string order) {
 
     }
 }
+
 
 void quicksort(team_stats* teams, int l, int r,string field, string order) {
     int i = l, j =r;
@@ -74,19 +121,19 @@ void quicksort(team_stats* teams, int l, int r,string field, string order) {
         }
         else if(typeOfField(field) == "string") {
             if(order =="incr") {
-            while(strcmp(teams[i].team_name, teams[l].team_name) < 0) {
-                i++;
-            }
-            while(strcmp(teams[j].team_name, teams[l].team_name) > 0) {
-                j--;
-            }
+                while(strcmp(teams[i].team_name, teams[l].team_name) < 0) {
+                    i++;
+                }
+                while(strcmp(teams[j].team_name, teams[l].team_name) > 0) {
+                    j--;
+                }
             } else {
-            while(strcmp(teams[i].team_name, teams[l].team_name) > 0) {
-                i++;
-            }
-            while(strcmp(teams[j].team_name, teams[l].team_name) < 0) {
-                j--;
-            }
+                while(strcmp(teams[i].team_name, teams[l].team_name) > 0) {
+                    i++;
+                }
+                while(strcmp(teams[j].team_name, teams[l].team_name) < 0) {
+                    j--;
+                }
             }
         }
         if(i <= j){
@@ -104,7 +151,6 @@ void quicksort(team_stats* teams, int l, int r,string field, string order) {
         quicksort(teams,i,r,field,order);
     }
 }
-
 
 void qsort(team_stats* teams, string field, string order) {
     int i = 0;
@@ -127,11 +173,14 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
         teams = annualStatsList[0].teams;
     }
 
-    if(command =="qsort" | command == "qfind") {
+    if(command =="qsort" || command == "qfind" ) {
         qsort(teams,field,order);
     }
-    else if(command =="bsort" | command == "bfind"){
+    else if(command =="bsort" || command == "bfind"){
         bsort(teams, field, order);
+    }
+    else if(command =="pmin"  || command == "pmax") {
+        pmax(teams, field, order);
     }
 
     if(order == "max" || order=="min" ||order == "average" || order =="median") {
@@ -206,7 +255,6 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
                     cout<<teams[0].team_name<< "\t\t" << getIntFieldValue(teams[0], field) <<endl;
                 }
             }
-
         }
     }
     else {
@@ -238,6 +286,7 @@ void sort_command(annual_stats* annualStatsList, int year, int endYear, string f
     }
     cin.clear();
 }
+
 
 bool compareFieldValues(team_stats* teams, string field, string order, int j) {
     bool compare;
@@ -391,8 +440,14 @@ main() {
             cin >> year;
             cin >> endYear;
         }
-        cin >> field;
-        cin >> order;
+        if(command == "pmin" || command == "pmax") {
+            cin >> field;
+            order = field;
+        }
+        else {
+            cin >> field;
+            cin >> order;
+        }
         sort_command(annualStatsList,year,endYear,field,order);
         cin.clear();
         cin.ignore();
