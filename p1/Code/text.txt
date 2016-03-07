@@ -1,0 +1,21 @@
+
+            cout << annualStatsList->teams[j].team_name<<endl;
+            cout << annualStatsList->teams[j].games<<endl;
+            cout << annualStatsList->teams[j].pts_per_game<<endl;
+            cout << annualStatsList->teams[j].total_points<<endl;
+            cout << annualStatsList->teams[j].scrimmage_plays<<endl;
+            cout << annualStatsList->teams[j].yds_per_game<<endl;
+            cout << annualStatsList->teams[j].yds_per_play<<endl;
+            cout << annualStatsList->teams[j].first_per_game<<endl;
+            cout << annualStatsList->teams[j].third_md<<endl;
+            cout << annualStatsList->teams[j].third_att<<endl;
+            cout << annualStatsList->teams[j].third_pct<<endl;
+            cout << annualStatsList->teams[j].fourth_md<<endl;
+            cout << annualStatsList->teams[j].fourth_att<<endl;
+            cout << annualStatsList->teams[j].fourth_pct<<endl;
+            cout << annualStatsList->teams[j].penalties<<endl;
+            cout << annualStatsList->teams[j].pen_yds<<endl;
+            cout << annualStatsList->teams[j].top_per_game<<endl;
+            cout <<annualStatsList->teams[j].fum<<endl;
+            cout <<annualStatsList->teams[j].lost<<endl;
+            cout <<annualStatsList->teams[j].to<<endl;
