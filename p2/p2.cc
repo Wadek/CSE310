@@ -14,66 +14,69 @@
 
 using namespace std;
 
-struct heapEntry* heapEntryList;
-struct symbolTableEntry* symbolTableEntryList;
-int hashTableSize, tempType;
-
-bool isPrime(int num) {
-    if (num <= 3) {
-        return num > 1;
-    } else if (num % 2 == 0 || num % 3 == 0) {
-        return false;
-    } else {
-        for (int i = 5; i * i <= num; i += 6) {
-            if (num % i == 0 || num % (i + 2) == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
-
 int getType(string type) {
     if(type =="INT") {
-        return 0;
+        return INT;
     }
     else if(type =="CHAR") {
-        return 1;
+        return CHAR;
     }
     else if(type =="BST") {
-        return 2;
-    }
+        return BST;
+    } else {
+		return -1;
+	}
 }
 
 string getCommand ( string command) {
-    if(command == "allocate") return "allocate";
+    if(command == "allocate") {
+	   	return "allocate";
+	}else {
+		return "";
+	}
+}
+
+void myMalloc() {
+}
+
+void myFree() {
 }
 
 void readInput() {
-    int n, numberOfCommands;
-    string symbol;
-    string type = "";
-    heapEntryList = new heapEntry[1];
-    symbolTableEntryList = new symbolTableEntry[1];
+    unsigned int k, t ,c;
+	int n;
+	int  tempType;
 
-    //begin input
-    cin >> n;
-    heapEntryList[1].blockSize = pow(2,n);
-    cin >> hashTableSize;
-    cin >> numberOfCommands;
-    for(int i = 0; i < numberOfCommands; i++) {
+    string type = "";
+
+    cin >> k;
+    n = pow(2,k);
+    cin >> t;
+
+	struct symbolTableEntry* symbolTableEntryList = new struct symbolTableEntry[t];
+	char *heap = new char[n];
+
+    cin >> c;
+    for(int i = 0; i < c; i++) {
         string command = "";
 
         cin >> command;
-        if(getCommand(command) == "allocate") {
-            cin >> type;
-            tempType = getType(type);
-            symbolTableEntryList[1].type = tempType;
-        }
-        cin >> symbol;
+        if(!getCommand(command).empty()) {
+				cout << "ERROR: invalid command" << endl;
+				break;
+		}
 
-        strcpy(symbolTableEntryList[1].symbol, symbol.c_str());
-    }
+		cin >> type;
+		tempType = getType(type);
+		if (tempType == -1) {
+			cout << "ERROR: invalid symbol type" << endl;
+			break;
+		}
+		symbolTableEntryList[i].type = tempType;
+		cin >> symbolTableEntryList[i].symbol;
+		int value;
+		cin >> value;
+	}
 }
 
 main() {
